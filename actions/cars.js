@@ -139,7 +139,7 @@ export async function addCar({ carData, images }) {
     if (!user) throw new Error("User not found");
 
     // Create a unique folder name for this car's images
-    const carId = uuidv4();
+    const carId = uuidv4(); // Generate a unique ID for the car, which will also be used as the folder name in Supabase storage
     const folderPath = `cars/${carId}`;
 
     // Initialize Supabase client for server-side operations
@@ -150,7 +150,7 @@ export async function addCar({ carData, images }) {
     const imageUrls = [];
 
     for (let i = 0; i < images.length; i++) {
-      const base64Data = images[i];
+      const base64Data = images[i]; // The images array is expected to contain base64-encoded strings of the images, so we can use them directly without conversion
 
       // Skip if image data is not valid
       if (!base64Data || !base64Data.startsWith("data:image/")) {
@@ -160,7 +160,7 @@ export async function addCar({ carData, images }) {
 
       // Extract the base64 part (remove the data:image/xyz;base64, prefix)
       const base64 = base64Data.split(",")[1];
-      const imageBuffer = Buffer.from(base64, "base64");
+      const imageBuffer = Buffer.from(base64, "base64"); // Create a buffer from the base64 string for uploading
 
       // Determine file extension from the data URL
       const mimeMatch = base64Data.match(/data:image\/([a-zA-Z0-9]+);/);
@@ -214,7 +214,7 @@ export async function addCar({ carData, images }) {
     });
 
     // Revalidate the cars list page
-    revalidatePath("/admin/cars");
+    revalidatePath("/admin/cars"); //revalidate mean to refresh the page data after a change, so the new car will appear in the list without needing a manual refresh 
 
     return {
       success: true,

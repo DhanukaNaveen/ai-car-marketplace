@@ -79,14 +79,14 @@ export const AddCarForm = () => {
 
   // Initialize form with react-hook-form and zod
   const {
-    register,
-    setValue,
-    getValues,
+    register, //This function is used to bind input fields to the form state (it connects the form inputs with react-hook-form so that their values can be tracked).
+    setValue, //This function allows you to programmatically set the value of a form field (useful for updating form values based on AI results or other interactions).
+    getValues,//This function retrieves the current values of the form fields (useful for getting the latest form data when processing with AI or submitting the form).
     formState: { errors },
     handleSubmit,
     watch,
   } = useForm({
-    resolver: zodResolver(carFormSchema),
+    resolver: zodResolver(carFormSchema), //resolver is used to integrate zod validation with react-hook-form, so it will automatically validate the form data against the defined schema and populate the errors object if there are any validation issues
     defaultValues: {
       make: "",
       model: "",
@@ -109,7 +109,7 @@ export const AddCarForm = () => {
     loading: addCarLoading,
     fn: addCarFn,
     data: addCarResult,
-  } = useFetch(addCar);
+  } = useFetch(addCar);  // This sets up a custom hook for adding a car, where addCar is the function that performs the API call to add a new car to the inventory. The hook provides loading state, a function to trigger the add car action (addCarFn), and the result of the add car operation (addCarResult).
 
   const {
     loading: processImageLoading,
@@ -251,7 +251,7 @@ export const AddCarForm = () => {
   }, []);
 
   const {
-    getRootProps: getMultiImageRootProps,
+    getRootProps: getMultiImageRootProps, //renames the getRootProps function from useDropzone to getMultiImageRootProps, which is used to set up the dropzone area for multiple image uploads in the form.
     getInputProps: getMultiImageInputProps,
   } = useDropzone({
     onDrop: onMultiImagesDrop,
@@ -271,7 +271,7 @@ export const AddCarForm = () => {
     if (uploadedImages.length === 0) {
       setImageError("Please upload at least one image");
       return;
-    }
+    } //
 
     // Prepare data for server action
     const carData = {
@@ -283,7 +283,7 @@ export const AddCarForm = () => {
     };
 
     // Call the addCar function with our useFetch hook
-    await addCarFn({
+    await addCarFn({  // This triggers the addCarFn function provided by the useFetch hook, passing in an object that contains the car details (carData) and the uploaded images (uploadedImages). The addCarFn function will handle the API call to add the new car to the inventory, and it will manage the loading state and handle any errors that may occur during the process.
       carData,
       images: uploadedImages,
     });
@@ -318,7 +318,7 @@ export const AddCarForm = () => {
                     <Label htmlFor="make">Make</Label>
                     <Input
                       id="make"
-                      {...register("make")}
+                      {...register("make")} // This binds the "make" input field to the form state, allowing react-hook-form to track its value and validation status.
                       placeholder="e.g. Toyota"
                       className={errors.make ? "border-red-500" : ""}
                     />
