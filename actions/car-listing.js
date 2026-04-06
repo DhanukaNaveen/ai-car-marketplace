@@ -43,7 +43,7 @@ export async function getCarFilters() {
     });
 
     // Get min and max prices using Prisma aggregations
-    const priceAggregations = await db.car.aggregate({
+    const priceAggregations = await db.car.aggregate({ //aggregation  is used to calculate the minimum and maximum price of available cars in the database. This is done using the Prisma ORM's aggregate function, which allows you to perform various aggregation operations on your data, such as calculating sums, averages, counts, and in this case, minimum and maximum values.
       where: { status: "AVAILABLE" },
       _min: { price: true },
       _max: { price: true },
@@ -53,7 +53,7 @@ export async function getCarFilters() {
       success: true,
       data: {
         makes: makes.map((item) => item.make),
-        bodyTypes: bodyTypes.map((item) => item.bodyType),
+        bodyTypes: bodyTypes.map((item) => item.bodyType), // This line extracts the bodyType property from each item in the bodyTypes array and creates a new array containing only the body types. The map function is used to iterate over each item in the bodyTypes array, and for each item, it returns the value of the bodyType property. The resulting array will contain all the unique body types available in the database.
         fuelTypes: fuelTypes.map((item) => item.fuelType),
         transmissions: transmissions.map((item) => item.transmission),
         priceRange: {
@@ -102,6 +102,7 @@ export async function getCars({
       status: "AVAILABLE",
     };
 
+    // Add search conditions
     if (search) {
       where.OR = [
         { make: { contains: search, mode: "insensitive" } },
@@ -110,6 +111,7 @@ export async function getCars({
       ];
     }
 
+    // Add filter conditions after search to ensure they are applied on the searched results
     if (make) where.make = { equals: make, mode: "insensitive" };
     if (bodyType) where.bodyType = { equals: bodyType, mode: "insensitive" };
     if (fuelType) where.fuelType = { equals: fuelType, mode: "insensitive" };
@@ -118,11 +120,11 @@ export async function getCars({
 
     // Add price range
     where.price = {
-      gte: parseFloat(minPrice) || 0,
+      gte: parseFloat(minPrice) || 0, //gte stands for "greater than or equal to". This means that the query will filter for cars that have a price greater than or equal to the specified minPrice. If minPrice is not provided or is invalid, it defaults to 0, ensuring that all cars with a price of 0 or more are included in the results.
     };
 
     if (maxPrice && maxPrice < Number.MAX_SAFE_INTEGER) {
-      where.price.lte = parseFloat(maxPrice);
+      where.price.lte = parseFloat(maxPrice); //lte stands for "less than or equal to". This means that the query will filter for cars that have a price less than or equal to the specified maxPrice. If maxPrice is provided and is less than Number.MAX_SAFE_INTEGER, it adds this condition to the where clause, ensuring that only cars with a price up to the specified maxPrice are included in the results.
     }
 
     // Calculate pagination
@@ -162,7 +164,7 @@ export async function getCars({
         select: { carId: true },
       });
 
-      wishlisted = new Set(savedCars.map((saved) => saved.carId));
+      wishlisted = new Set(savedCars.map((saved) => saved.carId));// This creates a Set of car IDs that the user has saved to their wishlist. By using a Set, we can efficiently check if a car is wishlisted by the user when we serialize the car data later on.
     }
 
     // Serialize and check wishlist status

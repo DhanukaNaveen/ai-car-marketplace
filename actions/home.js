@@ -52,7 +52,7 @@ export async function processImageSearch(file) {
 
     // Check rate limit
     const decision = await aj.protect(req, {
-      requested: 1, // Specify how many tokens to consume
+      requested: 1, // Specify how many tokens to consume for one search request
     });
 
     if (decision.isDenied()) {
@@ -78,8 +78,10 @@ export async function processImageSearch(file) {
     }
 
     // Initialize Gemini API
-    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY); // Initialize Gemini API with the provided API key
+    const modelName =
+      process.env.GEMINI_MODEL?.trim() || "gemini-2.5-flash";
+    const model = genAI.getGenerativeModel({ model: modelName }); // Configurable to avoid model name drift
 
     // Convert image file to base64
     const base64Image = await fileToBase64(file);

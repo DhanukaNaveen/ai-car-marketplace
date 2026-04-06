@@ -24,8 +24,8 @@ import {
 
 export const CarFilters = ({ filters }) => {
   const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
+  const pathname = usePathname(); // The usePathname hook is used to get the current URL path in a Next.js application. This allows the component to construct new URLs with updated query parameters when applying filters, ensuring that the user stays on the same page while the filters are applied.
+  const searchParams = useSearchParams(); // The useSearchParams hook is used to access the current URL's query parameters in a Next.js application. This allows the component to read the existing filter values from the URL, which can be used to initialize the filter state and ensure that the filters reflect the current URL parameters when the page loads or when the user navigates back and forth.
 
   // Get current filter values from searchParams
   const currentMake = searchParams.get("make") || "";
