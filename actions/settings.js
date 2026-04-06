@@ -13,7 +13,7 @@ export async function getDealershipInfo() {
     // Get the dealership record
     let dealership = await db.dealershipInfo.findFirst({
       include: {
-        workingHours: {
+        workingHours: { 
           orderBy: {
             dayOfWeek: "asc",
           },
@@ -125,7 +125,7 @@ export async function saveWorkingHours(workingHours) {
     });
 
     // Then create new hours
-    for (const hour of workingHours) {
+    for (const hour of workingHours) { // Loop through the provided working hours and create new records in the database for each day of the week, ensuring that the dealership's working hours are updated according to the admin's input.
       await db.workingHour.create({
         data: {
           dayOfWeek: hour.dayOfWeek,

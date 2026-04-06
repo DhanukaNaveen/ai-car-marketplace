@@ -69,7 +69,7 @@ const carFormSchema = z.object({
 });
 
 export const AddCarForm = () => {
-  const router = useRouter();
+  const router = useRouter();  
   const [imagePreview, setImagePreview] = useState(null);
   const [uploadedImages, setUploadedImages] = useState([]);
   const [uploadedAiImage, setUploadedAiImage] = useState(null);

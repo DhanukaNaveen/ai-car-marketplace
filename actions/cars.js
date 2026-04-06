@@ -26,7 +26,9 @@ export async function processCarImageWithAI(file) {
 
     // Initialize Gemini API
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY); // Initialize Gemini API with the provided API key
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" }); // Use the latest Gemini model for better image understanding
+    const modelName =
+      process.env.GEMINI_MODEL?.trim() || "gemini-2.5-flash";
+    const model = genAI.getGenerativeModel({ model: modelName }); // Configurable to avoid model name drift
 
     // Convert image file to base64
     const base64Image = await fileToBase64(file); // Convert the uploaded image file to a base64 string for inline data usage 
@@ -225,7 +227,7 @@ export async function addCar({ carData, images }) {
 }
 
 // Fetch all cars with simple search
-export async function getCars(search = "") {
+export async function getCars(search = "") {  
   try {
     // Build where conditions
     let where = {};
@@ -241,11 +243,11 @@ export async function getCars(search = "") {
 
     // Execute main query
     const cars = await db.car.findMany({
-      where,
+      where, // Apply the search filter if provided, otherwise fetch all cars
       orderBy: { createdAt: "desc" },
     });
 
-    const serializedCars = cars.map(serializeCarData);
+    const serializedCars = cars.map(serializeCarData);// Serialize the car data to ensure it's in a format suitable for frontend consumption, such as converting Date objects to strings and ensuring all fields are properly formatted
 
     return {
       success: true,
@@ -315,7 +317,7 @@ export async function deleteCar(id) {
     }
 
     // Revalidate the cars list page
-    revalidatePath("/admin/cars");
+    revalidatePath("/admin/cars");// Revalidate the cars list page to reflect the deletion immediately in the admin interface
 
     return {
       success: true,
