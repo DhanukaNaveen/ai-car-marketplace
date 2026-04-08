@@ -119,6 +119,7 @@ export function CarDetails({ car, testDriveInfo }) {
                 src={car.images[currentImageIndex]}
                 alt={`${car.year} ${car.make} ${car.model}`} //alt is used for accessibility and SEO, providing a text description of the image. Here, we use the car's year, make, and model to create a descriptive alt text that helps users understand what the image represents, especially if they are using screen readers or if the image fails to load.
                 fill
+                sizes="(max-width: 1024px) 100vw, 58vw"
                 className="object-cover"
                 priority
               />
@@ -148,6 +149,7 @@ export function CarDetails({ car, testDriveInfo }) {
                       index + 1
                     }`}
                     fill
+                    sizes="96px"
                     className="object-cover"
                   />
                 </div>
