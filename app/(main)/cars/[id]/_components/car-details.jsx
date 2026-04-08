@@ -78,7 +78,7 @@ export function CarDetails({ car, testDriveInfo }) {
   // Handle share
   const handleShare = () => {
     if (navigator.share) {
-      navigator
+      navigator  //The Web Share API allows you to invoke the native sharing capabilities of the user's device, enabling them to share content (like text, links, images) directly from the web application to other apps (like social media, messaging apps, email, etc.) without needing to copy and paste. In this code, we check if the browser supports the Web Share API using navigator.share. If it does, we call navigator.share() with an object containing the title, text, and URL to share. If the sharing action fails (e.g., if the user cancels the share or if there's an error), we catch the error and fall back to copying the link to the clipboard.
         .share({
           title: `${car.year} ${car.make} ${car.model}`,
           text: `Check out this ${car.year} ${car.make} ${car.model} on Vehiql!`,
@@ -117,7 +117,7 @@ export function CarDetails({ car, testDriveInfo }) {
             {car.images && car.images.length > 0 ? (
               <Image
                 src={car.images[currentImageIndex]}
-                alt={`${car.year} ${car.make} ${car.model}`}
+                alt={`${car.year} ${car.make} ${car.model}`} //alt is used for accessibility and SEO, providing a text description of the image. Here, we use the car's year, make, and model to create a descriptive alt text that helps users understand what the image represents, especially if they are using screen readers or if the image fails to load.
                 fill
                 className="object-cover"
                 priority
@@ -163,7 +163,7 @@ export function CarDetails({ car, testDriveInfo }) {
                 isWishlisted ? "text-red-500" : ""
               }`}
               onClick={handleSaveCar}
-              disabled={savingCar}
+              disabled={savingCar} 
             >
               <Heart
                 className={`h-5 w-5 ${isWishlisted ? "fill-red-500" : ""}`}
@@ -273,7 +273,7 @@ export function CarDetails({ car, testDriveInfo }) {
             <Button
               className="w-full py-6 text-lg"
               onClick={handleBookTestDrive}
-              disabled={testDriveInfo.userTestDrive}
+              disabled={testDriveInfo.userTestDrive} // Disable if already booked
             >
               <Calendar className="mr-2 h-5 w-5" />
               {testDriveInfo.userTestDrive

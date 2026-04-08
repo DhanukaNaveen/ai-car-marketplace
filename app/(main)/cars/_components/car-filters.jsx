@@ -82,9 +82,9 @@ export const CarFilters = ({ filters }) => {
 
   // Update URL when filters change
   const applyFilters = useCallback(() => {
-    const params = new URLSearchParams();
+    const params = new URLSearchParams(); // This creates a new instance of URLSearchParams, which is used to construct the query parameters for the URL when applying filters. By creating a new instance, we can build the query string based on the current filter state and then push the new URL to the router, allowing the application to update the displayed car listings based on the selected filters.
 
-    if (make) params.set("make", make);
+    if (make) params.set("make", make); // The function then checks if each filter (e.g., make, bodyType, etc.) has a value. If the value is not empty, it adds the corresponding query parameter to params.
     if (bodyType) params.set("bodyType", bodyType);
     if (fuelType) params.set("fuelType", fuelType);
     if (transmission) params.set("transmission", transmission);
@@ -119,7 +119,7 @@ export const CarFilters = ({ filters }) => {
   ]);
 
   // Handle filter changes
-  const handleFilterChange = (filterName, value) => {
+  const handleFilterChange = (filterName, value) => { //value is come from the CarFilterControls component when a user interacts with the filter controls (e.g., selects a make, body type, fuel type, etc.). The handleFilterChange function takes the name of the filter that changed (filterName) and the new value for that filter (value). It then updates the corresponding state variable based on the filterName using a switch statement. This allows the component to keep track of the current filter selections made by the user, which can later be applied to update the URL and fetch the filtered car listings when the user clicks the "Show Results" button.
     switch (filterName) {
       case "make":
         setMake(value);
@@ -154,8 +154,8 @@ export const CarFilters = ({ filters }) => {
     setSortBy("newest");
 
     // Keep search term if exists
-    const params = new URLSearchParams();
-    const search = searchParams.get("search");
+    const params = new URLSearchParams(); // This creates a new instance of URLSearchParams, which is used to construct the query parameters for the URL when clearing the filters. By creating a new instance, we can start with a clean slate and only add back the search term if it exists, ensuring that all other filters are reset while preserving the user's search query.
+    const search = searchParams.get("search");// The clearFilters function is responsible for resetting all the filter state variables to their default values (e.g., empty strings for make, body type, fuel type, transmission, and the default price range). However, it also checks if there is an existing search term in the URL parameters. If a search term exists, it preserves that search term in the new URL parameters when clearing the filters. This allows users to reset their filters while still keeping their search query intact, providing a better user experience when they want to start fresh with their filter selections but still want to see results based on their original search.
     if (search) params.set("search", search);
 
     const query = params.toString();
@@ -203,9 +203,9 @@ export const CarFilters = ({ filters }) => {
 
               <div className="py-6">
                 <CarFilterControls
-                  filters={filters}
-                  currentFilters={currentFilters}
-                  onFilterChange={handleFilterChange}
+                  filters={filters} //props passed to the CarFilterControls component, providing it with the necessary data to render the filter options and manage the filter state. The filters prop contains all the available filter options (such as makes, body types, fuel types, etc.) that the CarFilterControls component will use to display the filter controls to the user. By passing this data as props, we ensure that the CarFilterControls component has access to the information it needs to function correctly and allow users to select their desired filters for browsing cars.
+                  currentFilters={currentFilters} // The currentFilters prop is an object that contains the current state of all the filters (make, body type, fuel type, transmission, price range, etc.) that the user has selected. This allows the CarFilterControls component to display the current filter selections and manage changes to these filters. By passing the currentFilters as props, we enable the CarFilterControls component to reflect the user's current filter choices and update them as needed when the user interacts with the filter controls.
+                  onFilterChange={handleFilterChange} // The onFilterChange prop is a callback function that is passed to the CarFilterControls component. This function is called whenever a filter value changes within the CarFilterControls component. It takes two arguments: the name of the filter that changed (e.g., "make", "bodyType", "fuelType", etc.) and the new value for that filter. By passing this function as a prop, we allow the CarFilterControls component to communicate changes in the filter state back to the parent CarFilters component, which can then update its local state accordingly and apply the filters when the user clicks the "Show Results" button.
                   onClearFilter={handleClearFilter}
                 />
               </div>

@@ -161,7 +161,7 @@ export async function getCars({
     if (dbUser) {
       const savedCars = await db.userSavedCar.findMany({
         where: { userId: dbUser.id },
-        select: { carId: true },
+        select: { carId: true }, 
       });
 
       wishlisted = new Set(savedCars.map((saved) => saved.carId));// This creates a Set of car IDs that the user has saved to their wishlist. By using a Set, we can efficiently check if a car is wishlisted by the user when we serialize the car data later on.
@@ -300,7 +300,7 @@ export async function getCarById(carId) {
         },
       });
 
-      isWishlisted = !!savedCar;
+      isWishlisted = !!savedCar; //is there any value in savedCar if yes then true else false
     }
 
     // Check if user has already booked a test drive for this car
@@ -326,9 +326,9 @@ export async function getCarById(carId) {
     }
 
     // Get dealership info for test drive availability
-    const dealership = await db.dealershipInfo.findFirst({
-      include: {
-        workingHours: true,
+    const dealership = await db.dealershipInfo.findFirst({ //findFirst is used to fetch the first record 
+      include: { 
+        workingHours: true, 
       },
     });
 
@@ -386,7 +386,8 @@ export async function getSavedCars() {
     // Get saved cars with their details
     const savedCars = await db.userSavedCar.findMany({
       where: { userId: user.id },
-      include: {
+      include: {    //Also fetch the related car data from the Car table.include is used to fetch related (associated) data from another table/model along with your main query.
+
         car: true,
       },
       orderBy: { savedAt: "desc" },
