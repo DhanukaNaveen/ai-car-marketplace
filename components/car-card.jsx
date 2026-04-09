@@ -13,7 +13,7 @@ import { useAuth } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import useFetch from "@/hooks/use-fetch";
 
-export const CarCard = ({ car }) => {
+export const CarCard = ({ car, imagePriority = false, imageLoading }) => {
   const { isSignedIn } = useAuth();
   const router = useRouter(); // The useRouter hook from Next.js is used to programmatically navigate the user to different pages. In this component, it's used to redirect the user to the sign-in page if they try to save a car without being signed in, and to navigate to the car's detail page when they click the "View Car" button.
   const [isSaved, setIsSaved] = useState(car.wishlisted);
@@ -68,6 +68,8 @@ export const CarCard = ({ car }) => {
               alt={`${car.make} ${car.model}`}
               fill  
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+              priority={imagePriority}
+              loading={imageLoading}
               className="object-cover group-hover:scale-105 transition duration-300"
             />
           </div>
