@@ -73,7 +73,7 @@ function EmiCalculator({ price = 1000 }) {
 
   useEffect(() => {
     calculateLoan(loanAmount, downPayment, interestRate, loanTenure);
-  }, []);
+  }, [loanAmount, downPayment, interestRate, loanTenure]);
 
   const formatNumber = (num) => {
     return new Intl.NumberFormat("en-US").format(num);

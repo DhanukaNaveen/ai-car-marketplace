@@ -42,6 +42,7 @@ export const TestDrivesList = () => {
     fn: updateStatusFn,
     data: updateResult,
     error: updateError,
+    setData: setUpdateResult,
   } = useFetch(updateTestDriveStatus);
 
   const {
@@ -49,12 +50,13 @@ export const TestDrivesList = () => {
     fn: cancelTestDriveFn,
     data: cancelResult,
     error: cancelError,
+    setData: setCancelResult,
   } = useFetch(cancelTestDrive);
 
   // Initial fetch and refetch on search/filter changes
   useEffect(() => {
     fetchTestDrives({ search, status: statusFilter });
-  }, [search, statusFilter]);
+  }, [search, statusFilter, fetchTestDrives]);
 
   // Handle errors
   useEffect(() => {
@@ -74,12 +76,22 @@ export const TestDrivesList = () => {
     if (updateResult?.success) {
       toast.success("Test drive status updated successfully");
       fetchTestDrives({ search, status: statusFilter });
+      setUpdateResult(null);
     }
     if (cancelResult?.success) {
       toast.success("Test drive cancelled successfully");
       fetchTestDrives({ search, status: statusFilter });
+      setCancelResult(null);
     }
-  }, [updateResult, cancelResult]);
+  }, [
+    updateResult,
+    cancelResult,
+    fetchTestDrives,
+    search,
+    statusFilter,
+    setUpdateResult,
+    setCancelResult,
+  ]);
 
   // Handle search submit
   const handleSearchSubmit = (e) => {

@@ -44,6 +44,7 @@ export function CarDetails({ car, testDriveInfo }) {
     fn: toggleSavedCarFn,
     data: toggleResult,
     error: toggleError,
+    setData: setToggleResult,
   } = useFetch(toggleSavedCar);
 
   // Handle toggle result with useEffect
@@ -51,8 +52,9 @@ export function CarDetails({ car, testDriveInfo }) {
     if (toggleResult?.success) {
       setIsWishlisted(toggleResult.saved);
       toast.success(toggleResult.message);
+      setToggleResult(null);
     }
-  }, [toggleResult]);
+  }, [toggleResult, setToggleResult]);
 
   // Handle errors with useEffect
   useEffect(() => {

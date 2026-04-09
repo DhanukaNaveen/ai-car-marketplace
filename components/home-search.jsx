@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Search, Upload, Camera } from "lucide-react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
@@ -24,6 +25,7 @@ export function HomeSearch() {
     fn: processImageFn,
     data: processResult,
     error: processError,
+    setData: setProcessResult,
   } = useFetch(processImageSearch);
 
   // Handle process result and errors with useEffect
@@ -40,8 +42,9 @@ export function HomeSearch() {
 
       // Redirect to search results
       router.push(`/cars?${params.toString()}`);
+      setProcessResult(null);
     }
-  }, [processResult, router]);
+  }, [processResult, router, setProcessResult]);
 
   useEffect(() => {
     if (processError) {
@@ -147,10 +150,14 @@ export function HomeSearch() {
             <div className="border-2 border-dashed border-gray-300 rounded-3xl p-6 text-center">
               {imagePreview ? (
                 <div className="flex flex-col items-center">
-                  <img
+                  <Image
                     src={imagePreview}
                     alt="Car preview"
-                    className="h-40 object-contain mb-4"
+                    width={320}
+                    height={160}
+                    sizes="(max-width: 640px) 80vw, 320px"
+                    className="h-40 w-auto object-contain mb-4"
+                    unoptimized
                   />
                   <Button
                     variant="outline"

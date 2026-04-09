@@ -10,6 +10,15 @@ export async function getDealershipInfo() {
     const { userId } = await auth();
     if (!userId) throw new Error("Unauthorized");
 
+    // Check if user is admin
+    const adminUser = await db.user.findUnique({
+      where: { clerkUserId: userId },
+    });
+
+    if (!adminUser || adminUser.role !== "ADMIN") {
+      throw new Error("Unauthorized: Admin access required");
+    }
+
     // Get the dealership record
     let dealership = await db.dealershipInfo.findFirst({
       include: {

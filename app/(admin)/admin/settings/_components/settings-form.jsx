@@ -90,6 +90,7 @@ export const SettingsForm = () => {
     fn: saveHours,
     data: saveResult,
     error: saveError,
+    setData: setSaveResult,
   } = useFetch(saveWorkingHours);
 
   const {
@@ -104,13 +105,14 @@ export const SettingsForm = () => {
     fn: updateRole,
     data: updateRoleResult,
     error: updateRoleError,
+    setData: setUpdateRoleResult,
   } = useFetch(updateUserRole);
 
   // Fetch settings and users on component mount
   useEffect(() => {
     fetchDealershipInfo();
     fetchUsers();
-  }, []);
+  }, [fetchDealershipInfo, fetchUsers]);
 
   // Set working hours when settings data is fetched
   useEffect(() => {
@@ -172,6 +174,7 @@ export const SettingsForm = () => {
     if (saveResult?.success) {
       toast.success("Working hours saved successfully");
       fetchDealershipInfo();
+      setSaveResult(null);
     }
 
     if (updateRoleResult?.success) {
@@ -179,8 +182,16 @@ export const SettingsForm = () => {
       fetchUsers();
       setConfirmAdminDialog(false);
       setConfirmRemoveDialog(false);
+      setUpdateRoleResult(null);
     }
-  }, [saveResult, updateRoleResult]);
+  }, [
+    saveResult,
+    updateRoleResult,
+    fetchDealershipInfo,
+    fetchUsers,
+    setSaveResult,
+    setUpdateRoleResult,
+  ]);
 
   // Handle working hours change
   const handleWorkingHourChange = (index, field, value) => {
@@ -237,7 +248,8 @@ export const SettingsForm = () => {
             <CardHeader>
               <CardTitle>Working Hours</CardTitle>
               <CardDescription>
-                Set your dealership's working hours for each day of the week.
+                Set your dealership&apos;s working hours for each day of the
+                week.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -376,6 +388,7 @@ export const SettingsForm = () => {
                             <div className="flex items-center gap-2">
                               <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
                                 {user.imageUrl ? (
+                                  // eslint-disable-next-line @next/next/no-img-element
                                   <img
                                     src={user.imageUrl}
                                     alt={user.name || "User"}

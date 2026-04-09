@@ -68,6 +68,7 @@ export const CarsList = () => {
     fn: deleteCarFn,
     data: deleteResult,
     error: deleteError,
+    setData: setDeleteResult,
   } = useFetch(deleteCar);
 
   const {
@@ -75,12 +76,24 @@ export const CarsList = () => {
     fn: updateCarStatusFn,
     data: updateResult,
     error: updateError,
+    setData: setUpdateResult,
   } = useFetch(updateCarStatus);
+
+  // Debounce search to avoid excessive requests
+  const [debouncedSearch, setDebouncedSearch] = useState(search);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 400);
+
+    return () => clearTimeout(timer);
+  }, [search]);
 
   // Initial fetch and refetch on search changes
   useEffect(() => {
-    fetchCars(search);
-  }, [search]);
+    fetchCars(debouncedSearch);
+  }, [debouncedSearch, fetchCars]);
 
   // Handle errors
   useEffect(() => {
@@ -101,14 +114,23 @@ export const CarsList = () => {
   useEffect(() => {
     if (deleteResult?.success) {
       toast.success("Car deleted successfully");
-      fetchCars(search);
+      fetchCars(debouncedSearch);
+      setDeleteResult(null);
     }
 
     if (updateResult?.success) {
       toast.success("Car updated successfully");
-      fetchCars(search);
+      fetchCars(debouncedSearch);
+      setUpdateResult(null);
     }
-  }, [deleteResult, updateResult, search]);
+  }, [
+    deleteResult,
+    updateResult,
+    debouncedSearch,
+    fetchCars,
+    setDeleteResult,
+    setUpdateResult,
+  ]);
 
   // Handle search submit
   const handleSearchSubmit = (e) => {

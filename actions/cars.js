@@ -9,6 +9,21 @@ import { createClient } from "@/lib/supabase";
 import { auth } from "@clerk/nextjs/server";
 import { serializeCarData } from "@/lib/helpers";
 
+async function requireAdmin() {
+  const { userId } = await auth();
+  if (!userId) throw new Error("Unauthorized");
+
+  const user = await db.user.findUnique({
+    where: { clerkUserId: userId },
+  });
+
+  if (!user || user.role !== "ADMIN") {
+    throw new Error("Unauthorized: Admin access required");
+  }
+
+  return user;
+}
+
 // Function to convert File to base64
 async function fileToBase64(file) {
   const bytes = await file.arrayBuffer();
@@ -131,14 +146,7 @@ export async function processCarImageWithAI(file) {
 // Add a car to the database with images
 export async function addCar({ carData, images }) {
   try {
-    const { userId } = await auth();
-    if (!userId) throw new Error("Unauthorized");
-
-    const user = await db.user.findUnique({
-      where: { clerkUserId: userId },
-    });
-
-    if (!user) throw new Error("User not found");
+    await requireAdmin();
 
     // Create a unique folder name for this car's images
     const carId = uuidv4(); // Generate a unique ID for the car, which will also be used as the folder name in Supabase storage
@@ -265,8 +273,7 @@ export async function getCars(search = "") {
 // Delete a car by ID
 export async function deleteCar(id) {
   try {
-    const { userId } = await auth();
-    if (!userId) throw new Error("Unauthorized");
+    await requireAdmin();
 
     // First, fetch the car to get its images
     const car = await db.car.findUnique({
@@ -334,8 +341,7 @@ export async function deleteCar(id) {
 // Update car status or featured status
 export async function updateCarStatus(id, { status, featured }) {
   try {
-    const { userId } = await auth();
-    if (!userId) throw new Error("Unauthorized");
+    await requireAdmin();
 
     const updateData = {};
 

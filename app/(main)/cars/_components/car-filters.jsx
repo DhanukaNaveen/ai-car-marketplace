@@ -114,6 +114,7 @@ export const CarFilters = ({ filters }) => {
     sortBy,
     pathname,
     searchParams,
+    router,
     filters.priceRange.min,
     filters.priceRange.max,
   ]);

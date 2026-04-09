@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { format, parseISO } from "date-fns";
 import { useForm, Controller } from "react-hook-form";
@@ -12,6 +12,7 @@ import {
   CheckCircle2,
   Loader2,
 } from "lucide-react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent } from "@/components/ui/card";
@@ -76,7 +77,10 @@ export function TestDriveForm({ car, testDriveInfo }) {
 
   // Get dealership and booking information
   const dealership = testDriveInfo?.dealership;
-  const existingBookings = testDriveInfo?.existingBookings || [];
+  const existingBookings = useMemo(
+    () => testDriveInfo?.existingBookings || [],
+    [testDriveInfo]
+  );
 
   // Watch date field to update available time slots
   const selectedDate = watch("date");
@@ -87,6 +91,7 @@ export function TestDriveForm({ car, testDriveInfo }) {
     fn: bookTestDriveFn,
     data: bookingResult,
     error: bookingError,
+    setData: setBookingResult,
   } = useFetch(bookTestDrive);
 
   // Handle successful booking
@@ -107,8 +112,9 @@ export function TestDriveForm({ car, testDriveInfo }) {
 
       // Reset form
       reset();
+      setBookingResult(null);
     }
-  }, [bookingResult, reset]);
+  }, [bookingResult, reset, setBookingResult]);
 
   // Handle booking error
   useEffect(() => {
@@ -168,7 +174,7 @@ export function TestDriveForm({ car, testDriveInfo }) {
 
     // Clear time slot selection when date changes
     setValue("timeSlot", "");
-  }, [selectedDate]);
+  }, [selectedDate, dealership, existingBookings, setValue]);
 
   // Create a function to determine which days should be disabled
   const isDayDisabled = (day) => {
@@ -225,10 +231,12 @@ export function TestDriveForm({ car, testDriveInfo }) {
 
             <div className="aspect-video rounded-lg overflow-hidden relative mb-4">
               {car.images && car.images.length > 0 ? (
-                <img
+                <Image
                   src={car.images[0]}
                   alt={`${car.year} ${car.make} ${car.model}`}
-                  className="object-cover w-full h-full"
+                  fill
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                  className="object-cover"
                 />
               ) : (
                 <div className="w-full h-full bg-gray-200 flex items-center justify-center">
@@ -435,7 +443,7 @@ export function TestDriveForm({ car, testDriveInfo }) {
               <ul className="space-y-2 text-sm text-gray-600">
                 <li className="flex items-start">
                   <CheckCircle2 className="h-4 w-4 text-green-500 mr-2 mt-0.5" />
-                  Bring your driver's license for verification
+                  Bring your driver&apos;s license for verification
                 </li>
                 <li className="flex items-start">
                   <CheckCircle2 className="h-4 w-4 text-green-500 mr-2 mt-0.5" />
@@ -488,7 +496,7 @@ export function TestDriveForm({ car, testDriveInfo }) {
               </div>
 
               <div className="mt-4 bg-blue-50 p-3 rounded text-sm text-blue-700">
-                Please arrive 10 minutes early with your driver's license.
+                Please arrive 10 minutes early with your driver&apos;s license.
               </div>
             </div>
           )}

@@ -24,6 +24,7 @@ export const CarCard = ({ car, imagePriority = false, imageLoading }) => {
     fn: toggleSavedCarFn,
     data: toggleResult,
     error: toggleError,
+    setData: setToggleResult,
   } = useFetch(toggleSavedCar);
 
   // Handle toggle result with useEffect
@@ -31,8 +32,9 @@ export const CarCard = ({ car, imagePriority = false, imageLoading }) => {
     if (toggleResult?.success && toggleResult.saved !== isSaved) {
       setIsSaved(toggleResult.saved);
       toast.success(toggleResult.message);
+      setToggleResult(null);
     }
-  }, [toggleResult, isSaved]);
+  }, [toggleResult, isSaved, setToggleResult]);
 
   // Handle errors with useEffect
   useEffect(() => {

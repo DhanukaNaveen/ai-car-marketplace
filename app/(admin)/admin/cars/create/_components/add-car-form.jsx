@@ -109,6 +109,7 @@ export const AddCarForm = () => {
     loading: addCarLoading,
     fn: addCarFn,
     data: addCarResult,
+    setData: setAddCarResult,
   } = useFetch(addCar);  // This sets up a custom hook for adding a car, where addCar is the function that performs the API call to add a new car to the inventory. The hook provides loading state, a function to trigger the add car action (addCarFn), and the result of the add car operation (addCarResult).
 
   const {
@@ -116,6 +117,7 @@ export const AddCarForm = () => {
     fn: processImageFn,
     data: processImageResult,
     error: processImageError,
+    setData: setProcessImageResult,
   } = useFetch(processCarImageWithAI);
 
   // Handle successful car addition
@@ -123,8 +125,9 @@ export const AddCarForm = () => {
     if (addCarResult?.success) {
       toast.success("Car added successfully");
       router.push("/admin/cars");
+      setAddCarResult(null);
     }
-  }, [addCarResult, router]);
+  }, [addCarResult, router, setAddCarResult]);
 
   useEffect(() => {
     if (processImageError) {
@@ -164,8 +167,9 @@ export const AddCarForm = () => {
 
       // Switch to manual tab for the user to review and fill in missing details
       setActiveTab("manual");
+      setProcessImageResult(null);
     }
-  }, [processImageResult, setValue, uploadedAiImage]);
+  }, [processImageResult, setValue, uploadedAiImage, setProcessImageResult]);
 
   // Process image with Gemini AI
   const processWithAI = async () => {
@@ -664,10 +668,14 @@ export const AddCarForm = () => {
                 <div className="border-2 border-dashed rounded-lg p-6 text-center">
                   {imagePreview ? (
                     <div className="flex flex-col items-center">
-                      <img
+                      <Image
                         src={imagePreview}
                         alt="Car preview"
-                        className="max-h-56 max-w-full object-contain mb-4"
+                        width={560}
+                        height={320}
+                        sizes="(max-width: 640px) 90vw, 560px"
+                        className="max-h-56 w-auto object-contain mb-4"
+                        unoptimized
                       />
                       <div className="flex gap-2">
                         <Button
@@ -734,7 +742,10 @@ export const AddCarForm = () => {
                   <h3 className="font-medium mb-2">How it works</h3>
                   <ol className="space-y-2 text-sm text-gray-600 list-decimal pl-4">
                     <li>Upload a clear image of the car</li>
-                    <li>Click "Extract Details" to analyze with Gemini AI</li>
+                    <li>
+                      Click &quot;Extract Details&quot; to analyze with Gemini
+                      AI
+                    </li>
                     <li>Review the extracted information</li>
                     <li>Fill in any missing details manually</li>
                     <li>Add the car to your inventory</li>
