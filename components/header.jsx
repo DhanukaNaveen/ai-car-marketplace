@@ -21,9 +21,7 @@ const Header = async ({ isAdminPage = false }) => {
             height={60}
             className="h-12 w-auto object-contain"
           />
-          {isAdminPage && (
-            <span className="text-xs font-extralight">admin</span>
-          )}
+          
         </Link>
 
         {/* Action Buttons */}

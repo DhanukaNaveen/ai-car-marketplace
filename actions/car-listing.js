@@ -266,6 +266,13 @@ export async function toggleSavedCar(carId) {
  */
 export async function getCarById(carId) {
   try {
+    if (!carId) {
+      return {
+        success: false,
+        error: "Invalid car ID",
+      };
+    }
+
     // Get current user if authenticated
     const { userId } = await auth();
     let dbUser = null;

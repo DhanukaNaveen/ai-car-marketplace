@@ -31,6 +31,45 @@ async function fileToBase64(file) {
   return buffer.toString("base64");
 }
 
+// Upload a list of base64-encoded images to Supabase storage and return public URLs
+async function uploadCarImages(carId, images) {
+  const cookieStore = await cookies();
+  const supabase = createClient(cookieStore);
+  const folderPath = `cars/${carId}`;
+  const imageUrls = [];
+
+  for (let i = 0; i < images.length; i++) {
+    const base64Data = images[i];
+    if (!base64Data || !base64Data.startsWith("data:image/")) {
+      console.warn("Skipping invalid image data");
+      continue;
+    }
+
+    const base64 = base64Data.split(",")[1];
+    const imageBuffer = Buffer.from(base64, "base64");
+    const mimeMatch = base64Data.match(/data:image\/([a-zA-Z0-9]+);/);
+    const fileExtension = mimeMatch ? mimeMatch[1] : "jpeg";
+    const fileName = `image-${Date.now()}-${i}.${fileExtension}`;
+    const filePath = `${folderPath}/${fileName}`;
+
+    const { error } = await supabase.storage
+      .from("car-images")
+      .upload(filePath, imageBuffer, {
+        contentType: `image/${fileExtension}`,
+      });
+
+    if (error) {
+      console.error("Error uploading image:", error);
+      throw new Error(`Failed to upload image: ${error.message}`);
+    }
+
+    const publicUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/car-images/${filePath}`;
+    imageUrls.push(publicUrl);
+  }
+
+  return imageUrls;
+}
+
 // Gemini AI integration for car image processing
 export async function processCarImageWithAI(file) {
   try {
@@ -156,47 +195,7 @@ export async function addCar({ carData, images }) {
     const cookieStore = await cookies();
     const supabase = createClient(cookieStore);
 
-    // Upload all images to Supabase storage
-    const imageUrls = [];
-
-    for (let i = 0; i < images.length; i++) {
-      const base64Data = images[i]; // The images array is expected to contain base64-encoded strings of the images, so we can use them directly without conversion
-
-      // Skip if image data is not valid
-      if (!base64Data || !base64Data.startsWith("data:image/")) {
-        console.warn("Skipping invalid image data");
-        continue;
-      }
-
-      // Extract the base64 part (remove the data:image/xyz;base64, prefix)
-      const base64 = base64Data.split(",")[1];
-      const imageBuffer = Buffer.from(base64, "base64"); // Create a buffer from the base64 string for uploading
-
-      // Determine file extension from the data URL
-      const mimeMatch = base64Data.match(/data:image\/([a-zA-Z0-9]+);/);
-      const fileExtension = mimeMatch ? mimeMatch[1] : "jpeg";
-
-      // Create filename
-      const fileName = `image-${Date.now()}-${i}.${fileExtension}`;
-      const filePath = `${folderPath}/${fileName}`;
-
-      // Upload the file buffer directly
-      const { data, error } = await supabase.storage
-        .from("car-images")
-        .upload(filePath, imageBuffer, {
-          contentType: `image/${fileExtension}`,
-        });
-
-      if (error) {
-        console.error("Error uploading image:", error);
-        throw new Error(`Failed to upload image: ${error.message}`);
-      }
-
-      // Get the public URL for the uploaded file
-      const publicUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/car-images/${filePath}`; // disable cache in config
-
-      imageUrls.push(publicUrl);
-    }
+    const imageUrls = await uploadCarImages(carId, images);
 
     if (imageUrls.length === 0) {
       throw new Error("No valid images were uploaded");
@@ -231,6 +230,95 @@ export async function addCar({ carData, images }) {
     };
   } catch (error) {
     throw new Error("Error adding car:" + error.message);
+  }
+}
+
+export async function getCarById(id) {
+  try {
+    await requireAdmin();
+
+    const car = await db.car.findUnique({
+      where: { id },
+    });
+
+    if (!car) {
+      return {
+        success: false,
+        error: "Car not found",
+      };
+    }
+
+    return {
+      success: true,
+      data: serializeCarData(car),
+    };
+  } catch (error) {
+    console.error("Error fetching car:", error);
+    return {
+      success: false,
+      error: error.message,
+    };
+  }
+}
+
+export async function updateCar(id, { carData, existingImages, newImages }) {
+  try {
+    await requireAdmin();
+
+    // Ensure the car exists
+    const existingCar = await db.car.findUnique({
+      where: { id },
+    });
+
+    if (!existingCar) {
+      return {
+        success: false,
+        error: "Car not found",
+      };
+    }
+
+    const updatePayload = {
+      make: carData.make,
+      model: carData.model,
+      year: carData.year,
+      price: carData.price,
+      mileage: carData.mileage,
+      color: carData.color,
+      fuelType: carData.fuelType,
+      transmission: carData.transmission,
+      bodyType: carData.bodyType,
+      seats: carData.seats,
+      description: carData.description,
+      status: carData.status,
+      featured: carData.featured,
+      images: existingImages ?? existingCar.images,
+    };
+
+    if (newImages && newImages.length > 0) {
+      const newImageUrls = await uploadCarImages(id, newImages);
+      updatePayload.images = [...(updatePayload.images || []), ...newImageUrls];
+    }
+
+    if (!updatePayload.images || updatePayload.images.length === 0) {
+      throw new Error("A car must have at least one image");
+    }
+
+    await db.car.update({
+      where: { id },
+      data: updatePayload,
+    });
+
+    revalidatePath("/admin/cars");
+
+    return {
+      success: true,
+    };
+  } catch (error) {
+    console.error("Error updating car:", error);
+    return {
+      success: false,
+      error: error.message,
+    };
   }
 }
 

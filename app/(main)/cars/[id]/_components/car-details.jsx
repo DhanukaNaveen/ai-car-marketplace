@@ -107,6 +107,12 @@ export function CarDetails({ car, testDriveInfo }) {
       router.push("/sign-in");
       return;
     }
+
+    if (!car?.id) {
+      toast.error("Unable to book test drive: invalid car ID");
+      return;
+    }
+
     router.push(`/test-drive/${car.id}`);
   };
 
